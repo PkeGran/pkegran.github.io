@@ -3,11 +3,52 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Spoken</title>
+  <title>Spoken Chatbot Demo</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 50px;
+    }
+    header {
+      background-color: #333;
+      padding: 10px;
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    header a {
+      color: white;
+      text-decoration: none;
+      margin: 0 15px;
+      font-weight: bold;
+    }
+    header a:hover {
+      text-decoration: underline;
+    }
+    .container {
+      max-width: 600px;
+      margin: 0 auto;
+    }
+    h1 {
+      color: #333;
+    }
+  </style>
 </head>
 <body>
-  <h1>Spoken</h1>
-  <div id="chatbot"></div>
-  <script src="https://app.aminos.ai/js/chat_plugin.js" data-bot-id="35975"></script>
+  <!-- Header with navigation links -->
+  <header>
+    <a href="index.html">Home</a>
+    <a href="chatbot1.html">Spoken</a>
+    <!-- Uncomment these lines as needed for more chatbot demos -->
+    <!-- <a href="chatbot2.html">Chatbot Demo 2</a> -->
+    <!-- <a href="chatbot3.html">Chatbot Demo 3</a> -->
+  </header>
+
+  <div class="container">
+    <h1>Spoken Chatbot Demo</h1>
+    <div id="chatbot"></div>
+    <!-- Replace with your chatbot integration script -->
+    <script src="https://app.aminos.ai/js/chat_plugin.js" data-bot-id="35975"></script>
+  </div>
 </body>
 </html>
