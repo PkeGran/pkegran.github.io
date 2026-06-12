@@ -3,66 +3,572 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Chatbot Business</title>
+  <title>Klarsyn — AI chatbots for Nordic e-commerce</title>
+  <meta name="description" content="Klarsyn builds AI chatbots that speak your customers' language — Finnish, Swedish, English. Tailored to your brand, easy to add to any Shopify or custom site.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='7' fill='%232BBFB0'/><text x='6' y='23' font-size='20'>💬</text></svg>">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.x/dist/tabler-icons.min.css">
   <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --teal: #2BBFB0;
+      --teal-dim: rgba(43,191,176,0.12);
+      --teal-border: rgba(43,191,176,0.28);
+      --transition: 0.25s ease;
+    }
+
+    /* ── DARK MODE (default) ── */
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      padding: 50px;
+      --bg:        #0D1B2A;
+      --bg-card:   #162638;
+      --bg-hover:  #1E3248;
+      --border:    #243548;
+      --text-1:    #EEF3F8;
+      --text-2:    #8FACC4;
+      --text-3:    #4E6A82;
+      background: var(--bg);
+      color: var(--text-1);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+      line-height: 1.6;
+      transition: background var(--transition), color var(--transition);
     }
-    header {
-      background-color: #333;
-      padding: 10px;
-      text-align: center;
-      margin-bottom: 30px;
+
+    /* ── LIGHT MODE ── */
+    body.light {
+      --bg:        #F4F7FA;
+      --bg-card:   #FFFFFF;
+      --bg-hover:  #EBF0F6;
+      --border:    #D3DCE8;
+      --text-1:    #0D1B2A;
+      --text-2:    #4A6277;
+      --text-3:    #8AA0B5;
     }
-    header a {
-      color: white;
+
+    /* ── NAV ── */
+    nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 2rem;
+      border-bottom: 0.5px solid var(--border);
+      position: sticky;
+      top: 0;
+      background: var(--bg);
+      z-index: 100;
+      transition: background var(--transition), border-color var(--transition);
+    }
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
       text-decoration: none;
-      margin: 0 15px;
-      font-weight: bold;
     }
-    header a:hover {
-      text-decoration: underline;
+    .logo-img {
+      height: 30px;
+      width: auto;
     }
-    .container {
-      max-width: 600px;
+    .logo-fallback {
+      display: none;
+      width: 30px;
+      height: 30px;
+      background: var(--teal);
+      border-radius: 7px;
+      align-items: center;
+      justify-content: center;
+    }
+    .logo-fallback i { color: #0D1B2A; font-size: 16px; }
+    .logo-text {
+      font-size: 19px;
+      font-weight: 500;
+      letter-spacing: -0.3px;
+      color: var(--text-1);
+    }
+    .nav-right { display: flex; align-items: center; gap: 10px; }
+    .mode-toggle {
+      background: var(--bg-card);
+      border: 0.5px solid var(--border);
+      border-radius: 8px;
+      padding: 7px 11px;
+      cursor: pointer;
+      color: var(--text-2);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 13px;
+      transition: border-color 0.2s, color 0.2s, background var(--transition);
+    }
+    .mode-toggle:hover { border-color: var(--teal); color: var(--teal); }
+    .icon-sun  { display: none; }
+    .icon-moon { display: inline; }
+    body.light .icon-sun  { display: inline; }
+    body.light .icon-moon { display: none; }
+    .nav-cta {
+      background: var(--teal);
+      color: #0D1B2A;
+      border: none;
+      border-radius: 8px;
+      padding: 8px 18px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.15s;
+    }
+    .nav-cta:hover { opacity: 0.88; }
+
+    /* ── HERO ── */
+    .hero {
+      text-align: center;
+      padding: 5rem 1.5rem 3.5rem;
+      max-width: 640px;
       margin: 0 auto;
     }
-    h1 {
-      color: #333;
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: var(--bg-card);
+      border: 0.5px solid var(--border);
+      border-radius: 20px;
+      padding: 5px 14px;
+      font-size: 12px;
+      color: var(--teal);
+      margin-bottom: 1.75rem;
+      letter-spacing: 0.3px;
+      transition: background var(--transition), border-color var(--transition);
     }
-    p {
-      font-size: 1.2em;
+    .hero h1 {
+      font-size: 40px;
+      font-weight: 500;
+      line-height: 1.18;
+      letter-spacing: -0.5px;
+      margin-bottom: 1.1rem;
+      color: var(--text-1);
     }
-    a {
-      color: #007bff;
+    .hero h1 em { font-style: normal; color: var(--teal); }
+    .hero p {
+      font-size: 16px;
+      color: var(--text-2);
+      line-height: 1.75;
+      margin-bottom: 2.25rem;
+      max-width: 500px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .hero-btns { display: flex; gap: 10px; justify-content: center; flex-wrap: wrap; }
+    .btn-primary {
+      background: var(--teal);
+      color: #0D1B2A;
+      border: none;
+      border-radius: 8px;
+      padding: 11px 22px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 7px;
+      transition: opacity 0.15s;
+    }
+    .btn-primary:hover { opacity: 0.88; }
+    .btn-ghost {
+      background: transparent;
+      color: var(--text-1);
+      border: 0.5px solid var(--border);
+      border-radius: 8px;
+      padding: 11px 22px;
+      font-size: 15px;
+      cursor: pointer;
+      transition: border-color 0.2s, color 0.2s;
+    }
+    .btn-ghost:hover { border-color: var(--teal); color: var(--teal); }
+
+    /* ── SECTION SHARED ── */
+    .section { padding: 1rem 1.5rem 4rem; max-width: 760px; margin: 0 auto; }
+    .section-eyebrow {
+      text-align: center;
+      font-size: 11px;
+      font-weight: 500;
+      letter-spacing: 1.2px;
+      text-transform: uppercase;
+      color: var(--text-3);
+      margin-bottom: 1.5rem;
+    }
+
+    /* ── DEMOS ── */
+    .demo-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 14px;
+    }
+    .demo-card {
+      background: var(--bg-card);
+      border: 0.5px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem;
+      text-decoration: none;
+      display: block;
+      transition: border-color 0.15s, transform 0.15s, background var(--transition);
+    }
+    .demo-card:hover { border-color: var(--teal); transform: translateY(-2px); }
+    .demo-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 1rem;
+    }
+    .demo-icon {
+      width: 44px;
+      height: 44px;
+      border-radius: 10px;
+      background: var(--teal-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .demo-icon i { color: var(--teal); font-size: 22px; }
+    .demo-chip {
+      font-size: 11px;
+      padding: 3px 10px;
+      border-radius: 20px;
+      background: var(--teal-dim);
+      color: var(--teal);
+      border: 0.5px solid var(--teal-border);
+      font-weight: 500;
+    }
+    .demo-card h3 { font-size: 17px; font-weight: 500; color: var(--text-1); margin-bottom: 5px; }
+    .demo-card p { font-size: 13px; color: var(--text-2); line-height: 1.65; margin-bottom: 1rem; }
+    .demo-tags { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 1.1rem; }
+    .tag {
+      font-size: 11px;
+      padding: 3px 9px;
+      border-radius: 6px;
+      background: var(--bg-hover);
+      color: var(--text-3);
+      border: 0.5px solid var(--border);
+    }
+    .demo-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      color: var(--teal);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    /* ── LEAD-GEN ── */
+    .leadgen-box {
+      background: var(--bg-card);
+      border: 0.5px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem 2rem 2rem;
+      max-width: 760px;
+      margin: 0 auto 4rem;
+      transition: background var(--transition), border-color var(--transition);
+    }
+    .leadgen-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      background: var(--teal-dim);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 0.9rem;
+    }
+    .leadgen-icon i { color: var(--teal); font-size: 20px; }
+    .leadgen-box h2 { font-size: 18px; font-weight: 500; color: var(--text-1); margin-bottom: 0.45rem; }
+    .leadgen-box > p { font-size: 14px; color: var(--text-2); line-height: 1.65; margin-bottom: 1.5rem; }
+    .coming-soon {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 500;
+      padding: 2px 8px;
+      border-radius: 5px;
+      background: var(--bg-hover);
+      color: var(--text-3);
+      border: 0.5px solid var(--border);
+      margin-left: 8px;
+      vertical-align: middle;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .leadgen-form {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 10px;
+    }
+    .leadgen-form input {
+      background: var(--bg-hover);
+      border: 0.5px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 14px;
+      font-size: 14px;
+      color: var(--text-1);
+      outline: none;
+      transition: border-color 0.2s, background var(--transition);
+      width: 100%;
+    }
+    .leadgen-form input::placeholder { color: var(--text-3); }
+    .leadgen-form input:focus { border-color: var(--teal); }
+    .leadgen-form .full { grid-column: 1 / -1; }
+    .leadgen-submit {
+      grid-column: 1 / -1;
+      background: var(--teal);
+      color: #0D1B2A;
+      border: none;
+      border-radius: 8px;
+      padding: 11px 22px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: opacity 0.15s;
+      justify-self: start;
+    }
+    .leadgen-submit:hover { opacity: 0.88; }
+
+    /* ── FEATURES ── */
+    .feat-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+      gap: 12px;
+    }
+    .feat-card {
+      background: var(--bg-card);
+      border: 0.5px solid var(--border);
+      border-radius: 12px;
+      padding: 1.25rem;
+      transition: background var(--transition), border-color var(--transition);
+    }
+    .feat-card i { color: var(--teal); font-size: 20px; display: block; margin-bottom: 10px; }
+    .feat-card h4 { font-size: 14px; font-weight: 500; color: var(--text-1); margin-bottom: 4px; }
+    .feat-card p { font-size: 13px; color: var(--text-2); line-height: 1.55; }
+
+    /* ── CONTACT ── */
+    .contact-section {
+      text-align: center;
+      padding: 3rem 1.5rem 4.5rem;
+      border-top: 0.5px solid var(--border);
+      max-width: 640px;
+      margin: 0 auto;
+      transition: border-color var(--transition);
+    }
+    .contact-section h2 { font-size: 22px; font-weight: 500; color: var(--text-1); margin-bottom: 0.6rem; }
+    .contact-section p { font-size: 15px; color: var(--text-2); margin-bottom: 1.5rem; }
+    .contact-section a {
+      color: var(--teal);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 16px;
+    }
+
+    /* ── FOOTER ── */
+    footer {
+      border-top: 0.5px solid var(--border);
+      padding: 1.25rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      transition: border-color var(--transition);
+    }
+    footer p { font-size: 12px; color: var(--text-3); }
+    footer a { font-size: 12px; color: var(--text-3); text-decoration: none; }
+    footer a:hover { color: var(--teal); }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 600px) {
+      nav { padding: 0.9rem 1.25rem; }
+      .hero { padding: 3.5rem 1.25rem 2.5rem; }
+      .hero h1 { font-size: 28px; }
+      .section { padding: 1rem 1.25rem 3rem; }
+      .leadgen-box { margin: 0 1.25rem 3rem; padding: 1.5rem; }
+      .leadgen-form { grid-template-columns: 1fr; }
+      .leadgen-form .full { grid-column: 1; }
+      .leadgen-submit { grid-column: 1; width: 100%; }
+      footer { padding: 1rem 1.25rem; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { transition: none !important; }
     }
   </style>
 </head>
 <body>
-  <!-- Header with navigation links -->
-  <header>
-    <a href="index.html">Home</a>
-    <a href="chatbot1.html">Skärishop</a>
-    <a href="chatbot2.html">Sisu Shoppen</a>
-    <!-- Uncomment these lines as needed for more chatbot demos -->
-    <!-- <a href="chatbot3.html">Chatbot Demo 2</a> -->
-    <!-- <a href="chatbot4.html">Chatbot Demo 3</a> -->
-  </header>
 
-  <div class="container">
-    <h1>Welcome to My Chatbot Business</h1>
-    <p>We specialize in creating intelligent chatbots for different industries.</p>
-    <p>Explore our chatbot demos by visiting the links below:</p>
-    <ul>
-      <li><a href="chatbot1.html">Skärishop</a></li>
-      <li><a href="chatbot2.html">Sisu Shoppen</a></li>
-      <!-- Uncomment these lines as needed for more chatbot demos -->
-      <!-- <li><a href="chatbot3.html">Chatbot Demo 3</a></li> -->
-      <!-- <li><a href="chatbot4.html">Chatbot Demo 2</a></li> -->
-    </ul>
-    <p>For inquiries, contact us at <a href="mailto:per@klarsyn.fi">per@klarsyn.fi</a></p>
+  <!-- NAV -->
+  <nav>
+    <a class="logo" href="#">
+      <img
+        class="logo-img"
+        id="logo-img"
+        src="klarsyn-logo.png"
+        alt="Klarsyn"
+        onerror="this.style.display='none'; document.querySelector('.logo-fallback').style.display='flex'">
+      <span class="logo-fallback"><i class="ti ti-message-2" aria-hidden="true"></i></span>
+      <span class="logo-text">Klarsyn</span>
+    </a>
+    <div class="nav-right">
+      <button class="mode-toggle" id="modeToggle" aria-label="Toggle colour mode">
+        <i class="ti ti-moon icon-moon" aria-hidden="true"></i>
+        <i class="ti ti-sun icon-sun" aria-hidden="true"></i>
+        <span class="icon-moon">Light</span>
+        <span class="icon-sun">Dark</span>
+      </button>
+      <button class="nav-cta" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Get in touch</button>
+    </div>
+  </nav>
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="badge"><i class="ti ti-sparkles" aria-hidden="true"></i> AI chatbots for Nordic e-commerce</div>
+    <h1>Your shop, <em>always on</em> and always helpful</h1>
+    <p>Klarsyn builds AI assistants that speak your customers' language — literally. From the Finnish archipelago to the Swedish diaspora, we make sure no question goes unanswered.</p>
+    <div class="hero-btns">
+      <button class="btn-primary" onclick="document.getElementById('demos').scrollIntoView({behavior:'smooth'})">
+        <i class="ti ti-player-play" aria-hidden="true"></i> See the demos
+      </button>
+      <button class="btn-ghost" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Get in touch</button>
+    </div>
+  </section>
+
+  <!-- DEMOS -->
+  <div class="section" id="demos">
+    <p class="section-eyebrow">Live demos — click to try</p>
+    <div class="demo-grid">
+
+      <a href="chatbot1.html" class="demo-card">
+        <div class="demo-top">
+          <div class="demo-icon"><i class="ti ti-anchor" aria-hidden="true"></i></div>
+          <span class="demo-chip">Retail · Archipelago</span>
+        </div>
+        <h3>Skärishop</h3>
+        <p>A shop celebrating archipelago life along the Finland-Swedish coast — clothing, home goods, and local character. The bot handles product questions, orders, and island small talk in both Swedish and Finnish.</p>
+        <div class="demo-tags">
+          <span class="tag">Swedish</span>
+          <span class="tag">Finnish</span>
+          <span class="tag">Shopify</span>
+          <span class="tag">E-commerce</span>
+        </div>
+        <span class="demo-cta">Try the bot <i class="ti ti-arrow-right" aria-hidden="true"></i></span>
+      </a>
+
+      <a href="chatbot2.html" class="demo-card">
+        <div class="demo-top">
+          <div class="demo-icon"><i class="ti ti-heart" aria-hidden="true"></i></div>
+          <span class="demo-chip">Retail · Diaspora</span>
+        </div>
+        <h3>Sisu Shoppen</h3>
+        <p>A webshop for Sverigefinnar — Finns living in Sweden — with clothing and gifts that celebrate Finnish roots. The bot is warm, a little wry, and equally at home in Swedish and Finnish.</p>
+        <div class="demo-tags">
+          <span class="tag">Swedish</span>
+          <span class="tag">Finnish</span>
+          <span class="tag">Shopify</span>
+          <span class="tag">E-commerce</span>
+        </div>
+        <span class="demo-cta">Try the bot <i class="ti ti-arrow-right" aria-hidden="true"></i></span>
+      </a>
+
+    </div>
   </div>
+
+  <!-- LEAD-GEN -->
+  <div class="leadgen-box">
+    <div class="leadgen-icon"><i class="ti ti-wand" aria-hidden="true"></i></div>
+    <h2>Want to see it on your shop? <span class="coming-soon">Coming soon</span></h2>
+    <p>Enter your shop's URL and we'll build a custom demo bot tailored to your products and brand — no setup required. Leave your details and we'll be in touch.</p>
+    <form class="leadgen-form" onsubmit="handleLeadGen(event)">
+      <input type="text"  name="name"    placeholder="Your name"    autocomplete="name">
+      <input type="email" name="email"   placeholder="Email address" autocomplete="email" required>
+      <input type="url"   name="url"     placeholder="Your shop URL (https://...)" class="full" autocomplete="off">
+      <button type="submit" class="leadgen-submit">Notify me when it's ready</button>
+    </form>
+  </div>
+
+  <!-- FEATURES -->
+  <div class="section">
+    <div class="feat-grid">
+      <div class="feat-card">
+        <i class="ti ti-language" aria-hidden="true"></i>
+        <h4>Genuinely multilingual</h4>
+        <p>Finnish, Swedish, English — and the bot switches naturally mid-conversation.</p>
+      </div>
+      <div class="feat-card">
+        <i class="ti ti-brush" aria-hidden="true"></i>
+        <h4>Matches your brand</h4>
+        <p>Tone, personality, and knowledge tuned to your shop — not a generic assistant.</p>
+      </div>
+      <div class="feat-card">
+        <i class="ti ti-plug" aria-hidden="true"></i>
+        <h4>Easy to add</h4>
+        <p>Drops into any Shopify or custom site. No engineering team required.</p>
+      </div>
+      <div class="feat-card">
+        <i class="ti ti-clock" aria-hidden="true"></i>
+        <h4>Always available</h4>
+        <p>Handles FAQs, orders, and product queries around the clock, every day.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTACT -->
+  <div class="contact-section" id="contact">
+    <h2>Interested in a chatbot for your shop?</h2>
+    <p>Drop us a line and we'll talk through what a Klarsyn bot could look like for your business.</p>
+    <a href="mailto:per@klarsyn.fi">per@klarsyn.fi</a>
+  </div>
+
+  <!-- FOOTER -->
+  <footer>
+    <p>© 2025 Klarsyn · Helsinki, Finland</p>
+    <a href="mailto:per@klarsyn.fi">per@klarsyn.fi</a>
+  </footer>
+
+  <script>
+    // ── DARK / LIGHT TOGGLE ──
+    const body     = document.body;
+    const toggle   = document.getElementById('modeToggle');
+    const logoImg  = document.getElementById('logo-img');
+    const LOGO_DARK  = 'klarsyn-logo.png';
+    const LOGO_LIGHT = 'klarsyn-logo-dark-text.png';
+
+    function applyMode(mode) {
+      if (mode === 'light') {
+        body.classList.add('light');
+        if (logoImg) logoImg.src = LOGO_LIGHT;
+      } else {
+        body.classList.remove('light');
+        if (logoImg) logoImg.src = LOGO_DARK;
+      }
+    }
+
+    // Respect OS preference on first visit, then honour saved choice
+    const saved = localStorage.getItem('klarsyn-mode');
+    if (saved) {
+      applyMode(saved);
+    } else if (window.matchMedia('(prefers-color-scheme: light)').matches) {
+      applyMode('light');
+    }
+
+    toggle.addEventListener('click', () => {
+      const isLight = body.classList.contains('light');
+      const next = isLight ? 'dark' : 'light';
+      applyMode(next);
+      localStorage.setItem('klarsyn-mode', next);
+    });
+
+    // ── LEAD-GEN FORM ──
+    // Replace this function body with your real form handler
+    // (e.g. a fetch() to a Formspree/Netlify endpoint, or your own backend)
+    function handleLeadGen(e) {
+      e.preventDefault();
+      const form = e.target;
+      const btn  = form.querySelector('.leadgen-submit');
+      btn.textContent = "Thanks — we'll be in touch!";
+      btn.disabled = true;
+      form.querySelectorAll('input').forEach(i => i.disabled = true);
+    }
+  </script>
+
 </body>
 </html>
