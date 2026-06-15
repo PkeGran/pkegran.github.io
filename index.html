@@ -376,6 +376,44 @@
     footer a { font-size: 12px; color: var(--text-3); text-decoration: none; }
     footer a:hover { color: var(--teal); }
 
+    /* ── CHECKBOXES ── */
+    .checkbox-label {
+      font-size: 13px;
+      color: var(--text-2);
+      margin-bottom: 10px;
+    }
+    .checkbox-grid {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+    .checkbox-item {
+      display: flex;
+      align-items: center;
+      cursor: pointer;
+    }
+    .checkbox-item input[type="checkbox"] { display: none; }
+    .checkbox-item span {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 13px;
+      border-radius: 8px;
+      border: 0.5px solid var(--border);
+      background: var(--bg-hover);
+      color: var(--text-2);
+      font-size: 13px;
+      transition: border-color 0.15s, color 0.15s, background 0.15s;
+      user-select: none;
+    }
+    .checkbox-item span i { color: var(--text-3); font-size: 14px; transition: color 0.15s; }
+    .checkbox-item input:checked + span {
+      border-color: var(--teal);
+      color: var(--teal);
+      background: var(--teal-dim);
+    }
+    .checkbox-item input:checked + span i { color: var(--teal); }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 600px) {
       nav { padding: 0.9rem 1.25rem; }
@@ -474,13 +512,38 @@
   <!-- LEAD-GEN -->
   <div class="leadgen-box">
     <div class="leadgen-icon"><i class="ti ti-wand" aria-hidden="true"></i></div>
-    <h2>Want to see it on your shop? <span class="coming-soon">Coming soon</span></h2>
-    <p>Enter your shop's URL and we'll build a custom demo bot tailored to your products and brand — no setup required. Leave your details and we'll be in touch.</p>
+    <h2>Get a demo built for your business</h2>
+    <p>Tell us a bit about what you're after and we'll put together a demo bot tailored to your business. No setup on your end.</p>
     <form class="leadgen-form" onsubmit="handleLeadGen(event)">
-      <input type="text"  name="name"    placeholder="Your name"    autocomplete="name">
+      <input type="text"  name="name"    placeholder="Your name"     autocomplete="name">
       <input type="email" name="email"   placeholder="Email address" autocomplete="email" required>
-      <input type="url"   name="url"     placeholder="Your shop URL (https://...)" class="full" autocomplete="off">
-      <button type="submit" class="leadgen-submit">Notify me when it's ready</button>
+      <input type="text"  name="url"     placeholder="Your website URL" class="full" autocomplete="off" id="urlField">
+      <div class="full">
+        <p class="checkbox-label">What are you looking to solve with a chatbot?</p>
+        <div class="checkbox-grid">
+          <label class="checkbox-item">
+            <input type="checkbox" name="use_case" value="customer_support">
+            <span><i class="ti ti-headset" aria-hidden="true"></i> Customer support</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" name="use_case" value="lead_generation">
+            <span><i class="ti ti-target" aria-hidden="true"></i> Lead generation</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" name="use_case" value="bookings">
+            <span><i class="ti ti-calendar" aria-hidden="true"></i> Booking &amp; reservations</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" name="use_case" value="order_tracking">
+            <span><i class="ti ti-package" aria-hidden="true"></i> Order &amp; delivery tracking</span>
+          </label>
+          <label class="checkbox-item">
+            <input type="checkbox" name="use_case" value="other">
+            <span><i class="ti ti-dots" aria-hidden="true"></i> Something else</span>
+          </label>
+        </div>
+      </div>
+      <button type="submit" class="leadgen-submit">Request a demo</button>
     </form>
   </div>
 
@@ -555,6 +618,17 @@
       applyMode(next);
       localStorage.setItem('klarsyn-mode', next);
     });
+
+    // ── URL FIELD: prepend https:// on focus if empty ──
+    const urlField = document.getElementById('urlField');
+    if (urlField) {
+      urlField.addEventListener('focus', () => {
+        if (!urlField.value) urlField.value = 'https://';
+      });
+      urlField.addEventListener('blur', () => {
+        if (urlField.value === 'https://') urlField.value = '';
+      });
+    }
 
     // ── LEAD-GEN FORM ──
     // Replace this function body with your real form handler
