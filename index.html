@@ -102,6 +102,13 @@
     .icon-moon { display: inline; }
     body.light .icon-sun  { display: inline; }
     body.light .icon-moon { display: none; }
+    .nav-login {
+      color: var(--text-2);
+      text-decoration: none;
+      font-size: 14px;
+      transition: color 0.15s;
+    }
+    .nav-login:hover { color: var(--teal); }
     .nav-cta {
       background: var(--teal);
       color: #0D1B2A;
@@ -452,6 +459,7 @@
         <span class="icon-moon">Light</span>
         <span class="icon-sun">Dark</span>
       </button>
+      <a class="nav-login" href="https://app.klarsyn.fi">Log in</a>
       <button class="nav-cta" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Get in touch</button>
     </div>
   </nav>
