@@ -1,0 +1,224 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Singa Stabilized Prompter</title>
+    <style>
+        :root {
+            --bg: #000;
+            --active: #22c55e;
+            --next: #64748b;
+        }
+        body { background: var(--bg); color: white; font-family: sans-serif; margin: 0; overflow: hidden; }
+        
+        #prompter-window {
+            position: fixed; top: 0; width: 100%;
+            background: rgba(0,0,0,0.9); padding: 50px 20px;
+            text-align: center; border-bottom: 1px solid #333;
+            z-index: 100;
+        }
+
+        #current-line { font-size: 2.8rem; font-weight: bold; color: var(--active); margin-bottom: 15px; line-height: 1.2; transition: opacity 0.2s; }
+        #next-line { font-size: 1.8rem; color: var(--next); opacity: 0.6; }
+        #mic-status { font-size: 0.85rem; color: #555; margin-top: 10px; }
+
+        #return-btn {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            padding: 12px 28px;
+            border-radius: 30px;
+            border: 1px solid #444;
+            background: transparent;
+            color: #888;
+            font-size: 0.9rem;
+            font-weight: bold;
+            cursor: pointer;
+            display: none;
+            transition: background 0.2s, color 0.2s;
+            margin-top: 0;
+        }
+        #return-btn:hover { background: #222; color: #fff; transform: scale(1.05); }
+
+        #setup-area { margin-top: 300px; display: flex; flex-direction: column; align-items: center; }
+        
+        textarea { 
+            width: 80%; 
+            height: 250px; 
+            background: #111; 
+            color: #fff; 
+            border: 1px solid #444; 
+            padding: 15px; 
+            border-radius: 8px;
+            font-size: 1.1rem;
+            outline: none;
+        }
+        textarea::placeholder { color: #555; }
+        textarea:focus { border-color: var(--active); }
+
+        button { margin-top: 20px; padding: 15px 40px; border-radius: 30px; border: none; background: var(--active); font-weight: bold; cursor: pointer; font-size: 1rem; }
+        button:hover { transform: scale(1.05); }
+        
+        .hint { margin-top: 15px; color: #666; font-size: 0.9rem; text-align: center; line-height: 1.5; }
+    </style>
+</head>
+<body>
+
+<div id="prompter-window">
+    <div id="current-line">Mic Status: Idle</div>
+    <div id="next-line">Enter your script below to begin.</div>
+    <div id="mic-status"></div>
+</div>
+
+<div id="setup-area">
+    <textarea id="script-input" placeholder="Enter your script here..."></textarea>
+    <button onclick="start()">START PROMPTING</button>
+    <div class="hint">
+        <b>Arrows:</b> Up (Retake/Back) | Down (Manual Next)<br>
+        <i>The app listens for the last word of each line to auto-advance.</i>
+    </div>
+</div>
+
+<button id="return-btn" onclick="returnToSetup()">← Edit Script</button>
+
+<script>
+    let script = [];
+    let currentIndex = 0;
+    let recognition;
+    let isIgnoring = false;
+    let isRunning = false;
+    let micStream = null;
+
+    const currentEl = document.getElementById('current-line');
+    const nextEl = document.getElementById('next-line');
+    const micStatusEl = document.getElementById('mic-status');
+    const returnBtn = document.getElementById('return-btn');
+
+    function start() {
+        const raw = document.getElementById('script-input').value;
+        if (!raw.trim()) {
+            alert("Please paste a script first!");
+            return;
+        }
+
+        script = raw.split(/\n|(?<=[.!?])\s+/).map(t => t.trim()).filter(t => t.length > 0);
+        currentIndex = 0;
+
+        document.getElementById('setup-area').style.display = 'none';
+        returnBtn.style.display = 'block';
+        updateUI();
+        initSpeech();
+    }
+
+    function returnToSetup() {
+        isRunning = false;
+        if (recognition) { try { recognition.stop(); } catch(e) {} }
+        if (micStream) { micStream.getTracks().forEach(t => t.stop()); micStream = null; }
+
+        currentEl.innerText = "Mic Status: Idle";
+        nextEl.innerText = "Enter your script below to begin.";
+        micStatusEl.innerText = "";
+        returnBtn.style.display = 'none';
+        document.getElementById('setup-area').style.display = 'flex';
+    }
+
+    function updateUI() {
+        currentEl.innerText = script[currentIndex] || "FINISH";
+        nextEl.innerText = script[currentIndex + 1] || "";
+    }
+
+    function setMicStatus(msg) {
+        micStatusEl.innerText = msg;
+    }
+
+    function initSpeech() {
+        const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
+        if (!Speech) {
+            alert("Speech recognition not supported in this browser. Try Chrome.");
+            return;
+        }
+
+        setMicStatus("Requesting mic access...");
+
+        navigator.mediaDevices.getUserMedia({ audio: true })
+            .then(stream => {
+                micStream = stream;
+                setMicStatus("🎙 Mic active — listening");
+                startRecognition(Speech);
+            })
+            .catch(err => {
+                alert("Microphone access denied. Please allow mic access and try again.");
+            });
+    }
+
+    function startRecognition(Speech) {
+        recognition = new Speech();
+        recognition.continuous = true;
+        recognition.interimResults = false;
+        recognition.lang = 'en-US';
+
+        recognition.onresult = (event) => {
+            if (isIgnoring) return;
+            const result = event.results[event.results.length - 1];
+            if (result.isFinal) {
+                const transcript = result[0].transcript.toLowerCase();
+                const currentText = script[currentIndex].toLowerCase();
+                const words = currentText.split(' ');
+                const lastWord = words[words.length - 1].replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
+                if (transcript.includes(lastWord)) {
+                    moveNext();
+                }
+            }
+        };
+
+        recognition.onerror = (event) => {
+            if (event.error === 'no-speech' || event.error === 'aborted') return;
+            setMicStatus("⚠️ Mic error: " + event.error);
+            console.warn('Speech recognition error:', event.error);
+        };
+
+        recognition.onend = () => {
+            if (isRunning) {
+                setTimeout(() => {
+                    if (isRunning) {
+                        recognition.start();
+                        setMicStatus("🎙 Mic active — listening");
+                    }
+                }, 250);
+            }
+        };
+
+        isRunning = true;
+        recognition.start();
+    }
+
+    function moveNext() {
+        if (currentIndex < script.length - 1) {
+            currentIndex++;
+            updateUI();
+        }
+    }
+
+    function moveBack() {
+        if (currentIndex > 0) {
+            currentIndex--;
+            updateUI();
+            
+            isIgnoring = true;
+            currentEl.style.opacity = "0.3";
+            setTimeout(() => {
+                isIgnoring = false;
+                currentEl.style.opacity = "1";
+            }, 1500);
+        }
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (document.getElementById('setup-area').style.display === 'none') {
+            if (e.key === "ArrowDown") moveNext();
+            if (e.key === "ArrowUp") moveBack();
+        }
+    });
+</script>
+</body>
+</html>
