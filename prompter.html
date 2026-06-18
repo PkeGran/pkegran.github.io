@@ -21,6 +21,7 @@
         #current-line { font-size: 2.8rem; font-weight: bold; color: var(--active); margin-bottom: 15px; line-height: 1.2; transition: opacity 0.2s; }
         #next-line { font-size: 1.8rem; color: var(--next); opacity: 0.6; }
         #mic-status { font-size: 0.85rem; color: #555; margin-top: 10px; }
+        #version { font-size: 0.75rem; color: #333; margin-top: 6px; }
 
         #return-btn {
             position: fixed;
@@ -68,6 +69,7 @@
     <div id="current-line">Mic Status: Idle</div>
     <div id="next-line">Enter your script below to begin.</div>
     <div id="mic-status"></div>
+    <div id="version">v3</div>
 </div>
 
 <div id="setup-area">
@@ -159,7 +161,7 @@
         recognition = new Speech();
         recognition.continuous = true;
         recognition.interimResults = false;
-        recognition.lang = 'en-US';
+        recognition.lang = 'en-GB';
 
         recognition.onresult = function(event) {
             if (isIgnoring) return;
