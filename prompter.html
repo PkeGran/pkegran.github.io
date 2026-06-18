@@ -131,6 +131,10 @@
         micStatusEl.innerText = msg;
     }
 
+    function cleanWord(w) {
+        return w.replace(/[.,/#!$%^&*;:{}=\-_`~()]/g, '');
+    }
+
     function initSpeech() {
         const Speech = window.SpeechRecognition || window.webkitSpeechRecognition;
         if (!Speech) {
@@ -141,12 +145,12 @@
         setMicStatus("Requesting mic access...");
 
         navigator.mediaDevices.getUserMedia({ audio: true })
-            .then(stream => {
+            .then(function(stream) {
                 micStream = stream;
                 setMicStatus("🎙 Mic active — listening");
                 startRecognition(Speech);
             })
-            .catch(err => {
+            .catch(function() {
                 alert("Microphone access denied. Please allow mic access and try again.");
             });
     }
@@ -157,29 +161,44 @@
         recognition.interimResults = false;
         recognition.lang = 'en-US';
 
-        recognition.onresult = (event) => {
+        recognition.onresult = function(event) {
             if (isIgnoring) return;
             const result = event.results[event.results.length - 1];
-            if (result.isFinal) {
-                const transcript = result[0].transcript.toLowerCase();
-                const currentText = script[currentIndex].toLowerCase();
-                const words = currentText.split(' ');
-                const lastWord = words[words.length - 1].replace(/[.,\/#!$%\^&\*;:{}=\-_`~()]/g, "");
-                if (transcript.includes(lastWord)) {
-                    moveNext();
-                }
-            }
+            if (!result.isFinal) return;
+
+            const transcript = result[0].transcript.toLowerCase().trim();
+            const currentText = script[currentIndex].toLowerCase();
+            const words = currentText.split(' ').filter(function(w) { return w.length > 0; });
+
+            const lastWord = cleanWord(words[words.length - 1]);
+            const lastTwo = words.slice(-2).map(cleanWord);
+
+            // Match 1: last word appears in transcript
+            const matchesLast = lastWord.length > 2 && transcript.includes(lastWord);
+
+            // Match 2: both of the last two words appear in transcript
+            const matchesLastTwo = lastTwo.length === 2 &&
+                transcript.includes(lastTwo[0]) && transcript.includes(lastTwo[1]);
+
+            // Match 3: at least 40% of line words heard
+            const lineWords = words.map(cleanWord).filter(function(w) { return w.length > 2; });
+            const matchCount = lineWords.filter(function(w) { return transcript.includes(w); }).length;
+            const matchesPartial = lineWords.length > 0 && (matchCount / lineWords.length) >= 0.4;
+
+            const matched = matchesLast || matchesLastTwo || matchesPartial;
+            setMicStatus('🎙 Heard: "' + transcript + '" | trigger: ' + lastWord + ' | match: ' + matched);
+
+            if (matched) moveNext();
         };
 
-        recognition.onerror = (event) => {
+        recognition.onerror = function(event) {
             if (event.error === 'no-speech' || event.error === 'aborted') return;
             setMicStatus("⚠️ Mic error: " + event.error);
-            console.warn('Speech recognition error:', event.error);
         };
 
-        recognition.onend = () => {
+        recognition.onend = function() {
             if (isRunning) {
-                setTimeout(() => {
+                setTimeout(function() {
                     if (isRunning) {
                         recognition.start();
                         setMicStatus("🎙 Mic active — listening");
@@ -203,17 +222,17 @@
         if (currentIndex > 0) {
             currentIndex--;
             updateUI();
-            
+
             isIgnoring = true;
             currentEl.style.opacity = "0.3";
-            setTimeout(() => {
+            setTimeout(function() {
                 isIgnoring = false;
                 currentEl.style.opacity = "1";
             }, 1500);
         }
     }
 
-    document.addEventListener('keydown', (e) => {
+    document.addEventListener('keydown', function(e) {
         if (document.getElementById('setup-area').style.display === 'none') {
             if (e.key === "ArrowDown") moveNext();
             if (e.key === "ArrowUp") moveBack();
