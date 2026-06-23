@@ -437,6 +437,29 @@
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { transition: none !important; }
     }
+
+    /* ── CHATBOT WIDGET: dark mode overrides ── */
+    body:not(.light) .sc-message-list {
+      background: #0D1B2A !important;
+    }
+    body:not(.light) p.sc-message--text-content {
+      color: #EEF3F8 !important;
+    }
+    body:not(.light) .received .sc-message--text {
+      background: #162638 !important;
+    }
+    body:not(.light) div#poweredBy {
+      background-color: #0D1B2A !important;
+    }
+    body:not(.light) form.sc-user-input {
+      background: #1E3248 !important;
+    }
+    body:not(.light) .sc-user-input--text {
+      color: #EEF3F8 !important;
+    }
+    body:not(.light) .sc-user-input--button svg {
+      color: #8FACC4 !important;
+    }
   </style>
 </head>
 <body>
@@ -651,6 +674,5 @@
     }
   </script>
 
-  <script src="https://app.klarsyn.fi/js/chat_plugin.js" data-bot-id="59235"></script>
 </body>
 </html>
