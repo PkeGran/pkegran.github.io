@@ -83,7 +83,23 @@
       letter-spacing: -0.3px;
       color: var(--text-1);
     }
+    .nav-actions { display: flex; align-items: center; gap: 10px; }
     .nav-right { display: flex; align-items: center; gap: 10px; }
+    .nav-burger {
+      display: none;
+      background: var(--bg-card);
+      border: 0.5px solid var(--border);
+      border-radius: 8px;
+      width: 40px;
+      height: 40px;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--text-1);
+      font-size: 20px;
+      transition: border-color 0.2s, color 0.2s, background var(--transition);
+    }
+    .nav-burger:hover { border-color: var(--teal); color: var(--teal); }
     .mode-toggle {
       background: var(--bg-card);
       border: 0.5px solid var(--border);
@@ -424,6 +440,24 @@
     /* ── RESPONSIVE ── */
     @media (max-width: 600px) {
       nav { padding: 0.9rem 1.25rem; }
+      .nav-burger { display: flex; }
+      .nav-right {
+        display: none;
+        position: absolute;
+        top: 100%;
+        left: 0;
+        right: 0;
+        flex-direction: column;
+        align-items: stretch;
+        gap: 10px;
+        padding: 1rem 1.25rem 1.25rem;
+        background: var(--bg);
+        border-bottom: 0.5px solid var(--border);
+      }
+      nav.open .nav-right { display: flex; }
+      .nav-right .mode-toggle { justify-content: center; padding: 11px; font-size: 15px; }
+      .nav-right .nav-login { text-align: center; padding: 10px 0; font-size: 16px; }
+      .nav-cta { padding: 8px 14px; white-space: nowrap; }
       .hero { padding: 3.5rem 1.25rem 2.5rem; }
       .hero h1 { font-size: 28px; }
       .section { padding: 1rem 1.25rem 3rem; }
@@ -510,12 +544,13 @@
       <img
         class="logo-img"
         id="logo-img"
-        src="klarsyn-logo.png"
+        src="klarsyn-logo-teal-text.png"
         alt="Klarsyn"
         onerror="this.style.display='none'; document.querySelector('.logo-fallback').style.display='flex'">
       <span class="logo-fallback"><i class="ti ti-message-2" aria-hidden="true"></i></span>
     </a>
-    <div class="nav-right">
+    <div class="nav-actions">
+    <div class="nav-right" id="navMenu">
       <button class="mode-toggle" id="modeToggle" aria-label="Toggle colour mode">
         <i class="ti ti-moon icon-moon" aria-hidden="true"></i>
         <i class="ti ti-sun icon-sun" aria-hidden="true"></i>
@@ -523,7 +558,11 @@
         <span class="icon-sun">Dark</span>
       </button>
       <a class="nav-login" href="https://app.klarsyn.fi">Log in</a>
-      <button class="nav-cta" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Get in touch</button>
+    </div>
+    <button class="nav-cta" onclick="document.getElementById('contact').scrollIntoView({behavior:'smooth'})">Get in touch</button>
+    <button class="nav-burger" id="navBurger" aria-label="Open menu" aria-expanded="false" aria-controls="navMenu">
+      <i class="ti ti-menu-2" aria-hidden="true"></i>
+    </button>
     </div>
   </nav>
 
@@ -689,6 +728,22 @@
       applyMode(next);
       localStorage.setItem('klarsyn-mode', next);
     });
+
+    // ── MOBILE MENU ──
+    const nav     = document.querySelector('nav');
+    const burger  = document.getElementById('navBurger');
+    const burgerI = burger.querySelector('i');
+
+    function setMenu(open) {
+      nav.classList.toggle('open', open);
+      burger.setAttribute('aria-expanded', open);
+      burger.setAttribute('aria-label', open ? 'Close menu' : 'Open menu');
+      burgerI.className = open ? 'ti ti-x' : 'ti ti-menu-2';
+    }
+    burger.addEventListener('click', () => setMenu(!nav.classList.contains('open')));
+    document.querySelectorAll('.nav-login').forEach(el =>
+      el.addEventListener('click', () => setMenu(false)));
+    window.addEventListener('resize', () => { if (window.innerWidth > 600) setMenu(false); });
 
     // ── URL FIELD: prepend https:// on focus if empty ──
     const urlField = document.getElementById('urlField');
